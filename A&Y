@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Chat</title>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js"></script>
+    <script>
+        // Initialize Firebase
+        const firebaseConfig = <YOUR_FIREBASE_CONFIG>;
+        const app = firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        function sendMessage() {
+            const message = document.getElementById("messageInput").value;
+            db.collection("messages").add({
+                text: message,
+                timestamp: new Date()
+            });
+            document.getElementById("messageInput").value = "";
+        }
+
+        function loadMessages() {
+            db.collection("messages").orderBy("timestamp")
+            .onSnapshot((snapshot) => {
+                const messages = snapshot.docs.map(doc => doc.data().text).join("<br>");
+                document.getElementById("chatBox").innerHTML = messages;
+            });
+        }
+
+        window.onload = loadMessages;
+    </script>
+</head>
+<body>
+    <h2>Chat</h2>
+    <div id="chatBox" style="border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: scroll;"></div>
+    <input type="text" id="messageInput" placeholder="Type a message...">
+    <button onclick="sendMessage()">Send</button>
+</body>
+</html>
